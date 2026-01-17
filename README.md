@@ -1,4 +1,4 @@
-# Arome Floral – Gestion de Boutique Florale
+# Arome Floral – Gestion d'un café
 
 Application web simple de gestion de boutique florale (projet scolaire / personnel 2025-2026).  
 CRUD complet pour **Utilisateurs**, **Produits** et **Commandes**, authentification basique avec rôles (admin/client), dashboard stats + graphiques, persistance via localStorage.
