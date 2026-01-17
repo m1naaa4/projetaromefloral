@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail Facture – Arome Floral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --vert: #9fb8ad;
+            --vert-fonce: #3e4a44;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #faf7f2;
+        }
+        .navbar {
+            height: 70px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.05);
+        }
+        .content {
+            padding: 40px;
+        }
+        .card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 14px;
+            max-width: 800px;
+            margin: auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,.08);
+        }
+        h1 {
+            color: var(--vert-fonce);
+            margin-bottom: 20px;
+        }
+        .detail {
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+        .export-buttons {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .export-btn {
+            background: var(--vert);
+            color: #fff;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+        .export-btn:hover {
+            background: var(--vert-fonce);
+        }
+        .export-btn.csv {
+            background: #5cb85c;
+        }
+        .export-btn.csv:hover {
+            background: #4cae4c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2>Détail Facture</h2>
+</div>
+
+<div class="content">
+    <div class="card" id="facture-details">
+        Chargement...
+    </div>
+</div>
+
+<!-- jsPDF pour l'export PDF -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<script>
+const id = new URLSearchParams(window.location.search).get("id");
+
+fetch("https://dummyjson.com/carts/" + id)
+    .then(res => res.json())
+    .then(facture => {
+        // Préparation des données pour l'export
+        window.currentFacture = {
+            id: facture.id,
+            userId: facture.userId,
+            totalProducts: facture.totalProducts,
+            totalQuantity: facture.totalQuantity,
+            total: facture.total,
+            discountedTotal: facture.discountedTotal,
+            products: facture.products
+        };
+
+        // Affichage amélioré avec la liste des produits
+        let productsHTML = '<h3>Produits dans la facture</h3><table><thead><tr><th>Produit</th><th>Quantité</th><th>Prix unitaire</th><th>Total</th></tr></thead><tbody>';
+
+        facture.products.forEach(p => {
+            productsHTML += `
+                <tr>
+                    <td>${p.title}</td>
+                    <td>${p.quantity}</td>
+                    <td>${p.price.toFixed(2)} $</td>
+                    <td>${(p.quantity * p.price).toFixed(2)} $</td>
+                </tr>
+            `;
+        });
+
+        productsHTML += '</tbody></table>';
+
+        document.getElementById("facture-details").innerHTML = `
+            <h1>Facture #${facture.id}</h1>
+            <div class="detail"><strong>Utilisateur ID :</strong> ${facture.userId}</div>
+            <div class="detail"><strong>Nombre de produits :</strong> ${facture.totalProducts}</div>
+            <div class="detail"><strong>Quantité totale :</strong> ${facture.totalQuantity}</div>
+            <div class="detail"><strong>Total brut :</strong> ${facture.total.toFixed(2)} $</div>
+            <div class="detail"><strong>Total après réduction :</strong> ${facture.discountedTotal.toFixed(2)} $</div>
+
+            ${productsHTML}
+
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportPDF()">Exporter en PDF</button>
+                <button class="export-btn csv" onclick="exportCSV()">Exporter en CSV</button>
+            </div>
+        `;
+    })
+    .catch(err => {
+        document.getElementById("facture-details").innerHTML = `
+            <h1>Erreur</h1>
+            <p>Impossible de charger les informations de la facture.</p>
+        `;
+        console.error(err);
+    });
+
+// ────────────────────────────────────────────────
+// EXPORT PDF (amélioré avec structure claire)
+// ────────────────────────────────────────────────
+function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+
+    pdf.setFontSize(18);
+    pdf.setTextColor(62, 74, 68);
+    pdf.text(`Facture #${window.currentFacture.id} - Arome Floral`, 20, 20);
+
+    pdf.setFontSize(12);
+    pdf.setTextColor(0);
+    pdf.text(`Utilisateur ID : ${window.currentFacture.userId}`, 20, 35);
+    pdf.text(`Nombre de produits : ${window.currentFacture.totalProducts}`, 20, 45);
+    pdf.text(`Quantité totale : ${window.currentFacture.totalQuantity}`, 20, 55);
+    pdf.text(`Total brut : ${window.currentFacture.total.toFixed(2)} $`, 20, 65);
+    pdf.text(`Total après réduction : ${window.currentFacture.discountedTotal.toFixed(2)} $`, 20, 75);
+
+    // Liste des produits
+    pdf.setFontSize(14);
+    pdf.text("Produits :", 20, 95);
+
+    pdf.setFontSize(11);
+    let y = 110;
+    window.currentFacture.products.forEach((p, index) => {
+        pdf.text(`${index + 1}. ${p.title} × ${p.quantity}   ${p.price.toFixed(2)}$   →   ${(p.quantity * p.price).toFixed(2)}$`, 25, y);
+        y += 10;
+        if (y > 270) {
+            pdf.addPage();
+            y = 20;
+        }
+    });
+
+    pdf.save(`facture-${window.currentFacture.id}.pdf`);
+}
+
+// ────────────────────────────────────────────────
+// EXPORT CSV (facture + tous les produits)
+// ────────────────────────────────────────────────
+function exportCSV() {
+    if (!window.currentFacture) {
+        alert("Aucune donnée disponible pour l'export.");
+        return;
+    }
+
+    let csvRows = [];
+
+    // Ligne 1 : informations générales de la facture
+    csvRows.push([
+        "Type", "Facture ID", "Utilisateur ID", "Nombre produits", "Quantité totale", "Total brut ($)", "Total réduit ($)"
+    ].join(","));
+
+    csvRows.push([
+        "Facture",
+        window.currentFacture.id,
+        window.currentFacture.userId,
+        window.currentFacture.totalProducts,
+        window.currentFacture.totalQuantity,
+        window.currentFacture.total.toFixed(2),
+        window.currentFacture.discountedTotal.toFixed(2)
+    ].join(","));
+
+    // Ligne vide pour séparation
+    csvRows.push([]);
+
+    // En-tête produits
+    csvRows.push([
+        "Produit", "Quantité", "Prix unitaire ($)", "Total ligne ($)"
+    ].join(","));
+
+    // Lignes des produits
+    window.currentFacture.products.forEach(p => {
+        csvRows.push([
+            `"${p.title.replace(/"/g, '""')}"`,
+            p.quantity,
+            p.price.toFixed(2),
+            (p.quantity * p.price).toFixed(2)
+        ].join(","));
+    });
+
+    // Création du fichier
+    const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
+    const encodedUri = encodeURI(csvContent);
+
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `facture-${window.currentFacture.id}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+
+</body>
+</html>

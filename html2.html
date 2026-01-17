@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Arome Floral – Backoffice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css2.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="navbar-logo">
+            <div class="navbar-logo-text" data-i18n="logo">Arome Floral</div>
+        </div>
+        
+        <div class="navbar-right">
+            <!-- Dropdown internationalisation -->
+            <div class="language-dropdown">
+                <button class="language-btn" id="current-lang-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+                    </svg>
+                    <span id="current-lang-text">Français</span>
+                </button>
+                <div class="language-dropdown-content" id="lang-menu">
+                    <a href="#" data-lang="fr" class="language-option">
+                        <div class="language-flag french"></div>
+                        Français
+                    </a>
+                    <a href="#" data-lang="en" class="language-option">
+                        <div class="language-flag english"></div>
+                        English
+                    </a>
+                    <a href="#" data-lang="ar" class="language-option">
+                        <div class="language-flag arabic"></div>
+                        العربية
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Bouton de déconnexion -->
+            <button class="logout-btn" id="logout-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+                <span id="logout-text">Déconnexion</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-deco">
+            <div class="deco-circle"></div>
+            <div class="deco-line"></div>
+            <div class="deco-circle"></div>
+        </div>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="user.html">Utilisateurs</a>
+        <a href="product.html">Produits</a>
+        <a href="orders.html">Commandes</a>
+        <a href="clients.html">Clients</a>
+        <a href="factures.html">Factures</a>
+    </div>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="content">
+
+        <header class="header">
+            <div class="logo" data-i18n="logo">Arome Floral</div>
+            <nav class="nav">
+                <a href="#home" data-i18n="nav.home">Accueil</a>
+                <a href="#about" data-i18n="nav.about">À propos</a>
+                <a href="#menu" data-i18n="nav.menu">Menu</a>
+                <a href="#gallery" data-i18n="nav.gallery">Galerie</a>
+                <a href="#contact" data-i18n="nav.contact">Contact</a>
+            </nav>
+        </header>
+
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h1 data-i18n="hero.title">Café & Fleurs</h1>
+                <p data-i18n="hero.subtitle">Un coffee shop floral où chaque tasse est une douceur</p>
+                <a href="#menu" class="btn" data-i18n="hero.button">Découvrir</a>
+            </div>
+        </section>
+
+        <section class="about" id="about">
+            <h2 data-i18n="about.title">Notre univers</h2>
+            <p data-i18n="about.text">
+                Arome Floral est un espace élégant et apaisant,
+                mêlant café artisanal et esthétique florale.
+            </p>
+        </section>
+
+        <!-- STATS DASHBOARD -->
+        <section class="stats">
+            <div class="stat-card">
+                <h3 data-i18n="stats.users">Utilisateurs</h3>
+                <p>120</p>
+            </div>
+            <div class="stat-card">
+                <h3 data-i18n="stats.products">Produits</h3>
+                <p>35</p>
+            </div>
+            <div class="stat-card">
+                <h3 data-i18n="stats.orders">Commandes</h3>
+                <p>58</p>
+            </div>
+            <div class="stat-card">
+                <h3 data-i18n="stats.revenue">Revenus</h3>
+                <p>12 500 MAD</p>
+            </div>
+        </section>
+
+        <section class="menu" id="menu">
+            <h2 data-i18n="menu.title">Liste des produits</h2>
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <h3>Latte Rose</h3>
+                    <p>Café floral doux</p>
+                    <span>35 MAD</span>
+                </div>
+                <div class="menu-card">
+                    <h3>Matcha Latte</h3>
+                    <p>Matcha bio crémeux</p>
+                    <span>38 MAD</span>
+                </div>
+                <div class="menu-card">
+                    <h3>Cappuccino</h3>
+                    <p>Mousse légère</p>
+                    <span>32 MAD</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact" id="contact">
+            <h2 data-i18n="contact.title">Ajouter un élément</h2>
+            <form class="contact-form">
+                <input type="text" placeholder="Nom" data-i18n-placeholder="contact.name">
+                <input type="text" placeholder="Prix" data-i18n-placeholder="contact.price">
+                <textarea placeholder="Description" data-i18n-placeholder="contact.description"></textarea>
+                <button type="submit" data-i18n="contact.button">Ajouter</button>
+            </form>
+        </section>
+
+        <footer class="footer">
+            <p data-i18n="footer">© 2025 Arome Floral – Backoffice</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="api.js"></script>
+</body>
+</html>

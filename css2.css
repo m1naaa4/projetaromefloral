@@ -1,0 +1,616 @@
+/* ============================= */
+/* VARIABLES */
+/* ============================= */
+
+:root {
+    --rose: #d8a7b1;
+    --vert: #9fb8ad;
+    --vert-fonce: #4f665b;
+    --creme: #faf7f2;
+    --creme-fonce: #f3efe9;
+    --texte: #3e4a44;
+}
+
+/* ============================= */
+/* RESET */
+/* ============================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--creme);
+    color: var(--texte);
+    line-height: 1.6;
+}
+
+/* ============================= */
+/* SIDEBAR */
+/* ============================= */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100vh;
+
+    background-color: var(--creme-fonce);
+    border-right: 1px solid rgba(0,0,0,0.06);
+
+    padding: 40px 25px;
+}
+
+/* Déco pour remplacer le logo dans sidebar */
+.sidebar-deco {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 50px;
+    padding: 20px 0;
+}
+
+.deco-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rose), var(--vert));
+    margin: 5px 0;
+}
+
+.deco-line {
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--rose), var(--vert));
+    margin: 8px 0;
+    border-radius: 1px;
+}
+
+/* liens sidebar */
+.sidebar a {
+    display: block;
+    text-decoration: none;
+    font-size: 14px;
+    color: var(--vert-fonce);
+    margin-bottom: 22px;
+    padding-left: 4px;
+    transition: all 0.25s ease;
+}
+
+.sidebar a:hover {
+    color: var(--rose);
+    transform: translateX(6px);
+}
+
+/* ============================= */
+/* CONTENU GENERAL */
+/* ============================= */
+
+.content {
+    margin-left: 220px;
+}
+
+/* ============================= */
+/* HEADER */
+/* ============================= */
+
+.header {
+    height: 80px;
+    background-color: var(--creme);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    padding: 0 40px;
+}
+
+/* cacher le logo du header (double logo) */
+.header .logo {
+    display: none;
+}
+
+.nav a {
+    margin-left: 28px;
+    text-decoration: none;
+    font-size: 14px;
+    color: var(--texte);
+    transition: color 0.3s ease;
+}
+
+.nav a:hover {
+    color: var(--rose);
+}
+
+/* ============================= */
+/* HERO */
+/* ============================= */
+
+.hero {
+    min-height: 90vh;
+    background-image: url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+    background-size: cover;
+    background-position: center;
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(250, 247, 242, 0.78);
+}
+
+.hero-content {
+    position: relative;
+    text-align: center;
+    max-width: 600px;
+}
+
+.hero-content h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    color: var(--vert-fonce);
+    margin-bottom: 16px;
+}
+
+.hero-content p {
+    font-size: 15px;
+    color: #6a756f;
+    margin-bottom: 30px;
+}
+
+.btn {
+    border : none;
+    display: inline-block;
+    text-decoration: none;
+    background-color: var(--rose);
+    color: white;
+    padding: 12px 34px;
+    border-radius: 30px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #c7929e;
+    transform: translateY(-2px);
+}
+
+/* ============================= */
+/* ABOUT */
+/* ============================= */
+
+.about {
+    padding: 100px 60px;
+    text-align: center;
+}
+
+.about h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.about p {
+    max-width: 600px;
+    margin: auto;
+    font-size: 15px;
+    color: #6a756f;
+}
+
+/* ============================= */
+/* STATS */
+/* ============================= */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 30px;
+    padding: 80px 60px;
+}
+
+.stat-card {
+    background-color: white;
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.stat-card h3 {
+    font-size: 14px;
+    color: #6a756f;
+    margin-bottom: 10px;
+}
+
+.stat-card p {
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--vert-fonce);
+}
+
+/* ============================= */
+/* MENU */
+/* ============================= */
+
+.menu {
+    padding: 100px 60px;
+}
+
+.menu h2 {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    margin-bottom: 50px;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+}
+
+.menu-card {
+    background-color: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.menu-card h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+}
+
+.menu-card p {
+    font-size: 14px;
+    color: #6a756f;
+    margin-bottom: 12px;
+}
+
+.menu-card span {
+    font-weight: 500;
+    color: var(--rose);
+}
+
+/* ============================= */
+/* GALLERY */
+/* ============================= */
+
+.gallery {
+    padding: 100px 60px;
+}
+
+.gallery h2 {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.gallery-item {
+    height: 180px;
+    background-color: var(--vert);
+    border-radius: 14px;
+    opacity: 0.6;
+}
+
+/* ============================= */
+/* CONTACT */
+/* ============================= */
+
+.contact {
+    padding: 100px 60px;
+}
+
+.contact h2 {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.contact-form {
+    max-width: 500px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-family: inherit;
+}
+
+.contact-form button {
+    background-color: var(--vert);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+.contact-form button:hover {
+    background-color: var(--vert-fonce);
+}
+
+/* ============================= */
+/* FOOTER */
+/* ============================= */
+
+.footer {
+    text-align: center;
+    padding: 30px;
+    font-size: 13px;
+    color: #7a7a7a;
+}
+
+/* ============================= */
+/* AMELIORATION SIDEBAR (sans modifier le code existant) */
+/* ============================= */
+
+.sidebar {
+    box-shadow: 5px 0 25px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(10px);
+    background-color: rgba(250, 247, 242, 0.95);
+}
+
+.sidebar a {
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.sidebar a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, rgba(216, 167, 177, 0.1), rgba(159, 184, 173, 0.1));
+    transition: width 0.4s ease;
+    border-radius: 8px;
+    z-index: -1;
+}
+
+.sidebar a:hover {
+    color: var(--rose);
+    transform: translateX(6px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar a:hover::before {
+    width: 100%;
+}
+
+/* ============================= */
+/* NAVBAR (nouvelle) */
+/* ============================= */
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 220px;
+    right: 0;
+    height: 70px;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.navbar-logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--vert-fonce), var(--vert)); /* Changé pour correspondre à la sidebar */
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    font-family: 'Playfair Display', serif;
+}
+
+.navbar-logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--vert-fonce); /* Couleur de la sidebar */
+    font-weight: 700;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Dropdown internationalisation */
+.language-dropdown {
+    position: relative;
+}
+
+.language-btn {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--texte);
+    font-size: 14px;
+}
+
+.language-btn:hover {
+    background-color: var(--creme-fonce);
+    border-color: var(--rose);
+}
+
+.language-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--vert-fonce);
+}
+
+.language-dropdown-content {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    min-width: 160px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.language-dropdown:hover .language-dropdown-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(5px);
+}
+
+.language-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--texte);
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.language-option:hover {
+    background-color: var(--creme-fonce);
+    color: var(--rose);
+}
+
+.language-flag {
+    width: 24px;
+    height: 16px;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.language-flag.french {
+    background: linear-gradient(90deg, #002395 33%, white 33%, white 66%, #ED2939 66%);
+}
+
+.language-flag.english {
+    background: linear-gradient(0deg, #C8102E 25%, white 25%, white 50%, #C8102E 50%, #C8102E 75%, white 75%);
+    position: relative;
+}
+
+.language-flag.english::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40%;
+    height: 50%;
+    background-color: #012169;
+}
+
+.language-flag.arabic {
+    background: linear-gradient(0deg, #CE1126 33%, white 33%, white 66%, #000 66%);
+    position: relative;
+}
+
+.language-flag.arabic::before {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #006233;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+/* Bouton de déconnexion */
+.logout-btn {
+    background: linear-gradient(135deg, var(--rose), #c7929e);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, #c7929e, var(--rose));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(216, 167, 177, 0.3);
+}
+
+.logout-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: white;
+}
+
+/* ============================= */
+/* AJUSTEMENTS POUR LA NAVBAR */
+/* ============================= */
+
+/* Masquer le header original pour éviter le doublon */
+.header {
+    display: none;
+}
+
+/* Ajuster le contenu principal pour la nouvelle navbar */
+.content {
+    margin-top: 70px; /* Compensation pour la hauteur de la navbar fixe */
+}

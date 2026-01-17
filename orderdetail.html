@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail Commande – Arome Floral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --vert: #9fb8ad;
+            --vert-fonce: #3e4a44;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #faf7f2;
+            color: var(--vert-fonce);
+        }
+        .navbar {
+            height: 70px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .content {
+            padding: 40px;
+        }
+        .card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 14px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        h1, h3 {
+            color: var(--vert-fonce);
+            margin-bottom: 15px;
+        }
+        .detail {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 500;
+        }
+        .export-buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .export-btn {
+            background: var(--vert);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+        .export-btn:hover {
+            background: var(--vert-fonce);
+        }
+        .export-btn.csv {
+            background: #5cb85c;
+        }
+        .export-btn.csv:hover {
+            background: #4cae4c;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2>Détail Commande</h2>
+</div>
+
+<div class="content">
+    <div class="card" id="order-details">
+        Chargement...
+    </div>
+</div>
+
+<!-- jsPDF pour l'export PDF -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<script>
+const id = new URLSearchParams(window.location.search).get("id");
+
+if (!id) {
+    document.getElementById("order-details").innerHTML = "<h1>Erreur</h1><p>ID de commande manquant.</p>";
+} else {
+    fetch(`https://dummyjson.com/carts/${id}`)
+        .then(res => {
+            if (!res.ok) throw new Error("Commande non trouvée");
+            return res.json();
+        })
+        .then(order => {
+            // Stockage pour les exports
+            window.currentOrder = order;
+
+            // Construction du HTML
+            let productsTable = `
+                <h3>Produits commandés</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Quantité</th>
+                            <th>Prix unitaire</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            order.products.forEach(p => {
+                const lineTotal = p.quantity * p.price;
+                productsTable += `
+                    <tr>
+                        <td>${p.title}</td>
+                        <td>${p.quantity}</td>
+                        <td>${p.price.toFixed(2)} $</td>
+                        <td>${lineTotal.toFixed(2)} $</td>
+                    </tr>
+                `;
+            });
+
+            productsTable += '</tbody></table>';
+
+            document.getElementById("order-details").innerHTML = `
+                <h1>Commande #${order.id}</h1>
+                <div class="detail"><strong>Client ID :</strong> ${order.userId}</div>
+                <div class="detail"><strong>Date :</strong> ${new Date(order.date).toLocaleDateString('fr-FR')}</div>
+                <div class="detail"><strong>Nombre de produits :</strong> ${order.totalProducts}</div>
+                <div class="detail"><strong>Quantité totale :</strong> ${order.totalQuantity}</div>
+                <div class="detail"><strong>Total brut :</strong> ${order.total.toFixed(2)} $</div>
+                <div class="detail"><strong>Total après réduction :</strong> ${order.discountedTotal.toFixed(2)} $</div>
+
+                ${productsTable}
+
+                <div class="export-buttons">
+                    <button class="export-btn" onclick="exportToPDF()">Exporter en PDF</button>
+                    <button class="export-btn csv" onclick="exportToCSV()">Exporter en CSV</button>
+                </div>
+            `;
+        })
+        .catch(err => {
+            document.getElementById("order-details").innerHTML = `
+                <h1>Erreur</h1>
+                <p>Impossible de charger la commande (ID: ${id}).</p>
+                <p>${err.message}</p>
+            `;
+            console.error(err);
+        });
+}
+
+// ────────────────────────────────────────────────
+// EXPORT PDF
+// ────────────────────────────────────────────────
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.setTextColor(62, 74, 68);
+    doc.text(`Commande #${window.currentOrder.id} - Arome Floral`, 20, 20);
+
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text(`Client ID : ${window.currentOrder.userId}`, 20, 35);
+    doc.text(`Date : ${new Date(window.currentOrder.date).toLocaleDateString('fr-FR')}`, 20, 45);
+    doc.text(`Nombre de produits : ${window.currentOrder.totalProducts}`, 20, 55);
+    doc.text(`Quantité totale : ${window.currentOrder.totalQuantity}`, 20, 65);
+    doc.text(`Total brut : ${window.currentOrder.total.toFixed(2)} $`, 20, 75);
+    doc.text(`Total réduit : ${window.currentOrder.discountedTotal.toFixed(2)} $`, 20, 85);
+
+    doc.setFontSize(14);
+    doc.text("Produits :", 20, 105);
+
+    doc.setFontSize(11);
+    let y = 120;
+    window.currentOrder.products.forEach((p, i) => {
+        doc.text(`${i+1}. ${p.title}  × ${p.quantity}   ${p.price.toFixed(2)}$   →   ${(p.quantity * p.price).toFixed(2)}$`, 25, y);
+        y += 10;
+        if (y > 270) {
+            doc.addPage();
+            y = 20;
+        }
+    });
+
+    doc.save(`commande-${window.currentOrder.id}.pdf`);
+}
+
+// ────────────────────────────────────────────────
+// EXPORT CSV
+// ────────────────────────────────────────────────
+function exportToCSV() {
+    if (!window.currentOrder) {
+        alert("Aucune donnée disponible.");
+        return;
+    }
+
+    let rows = [];
+
+    // Infos générales
+    rows.push(["Type", "Commande ID", "Client ID", "Date", "Nb produits", "Qté totale", "Total brut ($)", "Total réduit ($)"]);
+    rows.push([
+        "Commande",
+        window.currentOrder.id,
+        window.currentOrder.userId,
+        new Date(window.currentOrder.date).toISOString().split('T')[0],
+        window.currentOrder.totalProducts,
+        window.currentOrder.totalQuantity,
+        window.currentOrder.total.toFixed(2),
+        window.currentOrder.discountedTotal.toFixed(2)
+    ]);
+
+    rows.push([]); // ligne vide
+
+    // En-tête produits
+    rows.push(["Produit", "Quantité", "Prix unitaire ($)", "Total ligne ($)"]);
+
+    // Lignes produits
+    window.currentOrder.products.forEach(p => {
+        rows.push([
+            `"${p.title.replace(/"/g, '""')}"`,
+            p.quantity,
+            p.price.toFixed(2),
+            (p.quantity * p.price).toFixed(2)
+        ]);
+    });
+
+    const csv = "data:text/csv;charset=utf-8," + rows.map(row => row.join(",")).join("\n");
+    const uri = encodeURI(csv);
+
+    const link = document.createElement("a");
+    link.href = uri;
+    link.download = `commande-${window.currentOrder.id}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+
+</body>
+</html>

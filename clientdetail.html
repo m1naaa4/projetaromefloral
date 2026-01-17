@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail Client – Arome Floral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --vert: #9fb8ad;
+            --vert-fonce: #3e4a44;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #faf7f2;
+        }
+        .navbar {
+            height: 70px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.05);
+        }
+        .content {
+            padding: 40px;
+        }
+        .card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 14px;
+            max-width: 700px;
+            margin: auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,.08);
+        }
+        h1 {
+            color: var(--vert-fonce);
+            margin-bottom: 20px;
+        }
+        .detail {
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+        .export-buttons {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .export-btn {
+            background: var(--vert);
+            color: #fff;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+        .export-btn:hover {
+            background: var(--vert-fonce);
+        }
+        .export-btn.csv {
+            background: #5cb85c;
+        }
+        .export-btn.csv:hover {
+            background: #4cae4c;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2>Détail Client</h2>
+</div>
+
+<div class="content">
+    <div class="card" id="client-details">
+        Chargement...
+    </div>
+</div>
+
+<!-- Librairie PDF (toujours nécessaire pour l'export PDF) -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<script>
+const id = new URLSearchParams(window.location.search).get("id");
+
+fetch("https://dummyjson.com/users/" + id)
+    .then(res => res.json())
+    .then(client => {
+        // Affichage des informations
+        document.getElementById("client-details").innerHTML = `
+            <h1>${client.firstName} ${client.lastName}</h1>
+            <div class="detail"><strong>Email :</strong> ${client.email}</div>
+            <div class="detail"><strong>Téléphone :</strong> ${client.phone}</div>
+            <div class="detail"><strong>Ville :</strong> ${client.address.city}</div>
+            <div class="detail"><strong>Adresse complète :</strong> ${client.address.address}</div>
+            <div class="detail"><strong>Entreprise :</strong> ${client.company.name}</div>
+            <div class="detail"><strong>Nom de l'entreprise :</strong> ${client.company.title || '—'}</div>
+
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportPDF()">Exporter en PDF</button>
+                <button class="export-btn csv" onclick="exportCSV()">Exporter en CSV</button>
+            </div>
+        `;
+
+        // On stocke les données du client pour l'export CSV
+        window.currentClient = {
+            id: client.id,
+            firstName: client.firstName,
+            lastName: client.lastName,
+            fullName: `${client.firstName} ${client.lastName}`,
+            email: client.email,
+            phone: client.phone,
+            city: client.address.city,
+            address: client.address.address,
+            company: client.company.name,
+            companyTitle: client.company.title || ''
+        };
+    })
+    .catch(err => {
+        document.getElementById("client-details").innerHTML = `
+            <h1>Erreur</h1>
+            <p>Impossible de charger les informations du client.</p>
+        `;
+        console.error(err);
+    });
+
+// ────────────────────────────────────────────────
+// EXPORT PDF (amélioré avec mise en page propre)
+// ────────────────────────────────────────────────
+function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+
+    pdf.setFontSize(20);
+    pdf.setTextColor(62, 74, 68); // vert-fonce
+    pdf.text("Détail Client - Arome Floral", 20, 20);
+
+    pdf.setFontSize(14);
+    pdf.setTextColor(0);
+    pdf.text(`Nom complet : ${window.currentClient.fullName}`, 20, 40);
+    pdf.text(`Email : ${window.currentClient.email}`, 20, 50);
+    pdf.text(`Téléphone : ${window.currentClient.phone}`, 20, 60);
+    pdf.text(`Ville : ${window.currentClient.city}`, 20, 70);
+    pdf.text(`Adresse : ${window.currentClient.address}`, 20, 80);
+    pdf.text(`Entreprise : ${window.currentClient.company}`, 20, 90);
+    if (window.currentClient.companyTitle) {
+        pdf.text(`Poste : ${window.currentClient.companyTitle}`, 20, 100);
+    }
+
+    pdf.save(`client-${window.currentClient.id}-${window.currentClient.lastName}.pdf`);
+}
+
+// ────────────────────────────────────────────────
+// EXPORT CSV (simple et propre)
+// ────────────────────────────────────────────────
+function exportCSV() {
+    if (!window.currentClient) {
+        alert("Aucune donnée disponible pour l'export.");
+        return;
+    }
+
+    // En-têtes et valeurs
+    const headers = [
+        "ID",
+        "Prénom",
+        "Nom",
+        "Nom complet",
+        "Email",
+        "Téléphone",
+        "Ville",
+        "Adresse",
+        "Entreprise",
+        "Poste"
+    ];
+
+    const values = [
+        window.currentClient.id,
+        `"${window.currentClient.firstName}"`,
+        `"${window.currentClient.lastName}"`,
+        `"${window.currentClient.fullName}"`,
+        `"${window.currentClient.email}"`,
+        `"${window.currentClient.phone}"`,
+        `"${window.currentClient.city}"`,
+        `"${window.currentClient.address}"`,
+        `"${window.currentClient.company}"`,
+        `"${window.currentClient.companyTitle}"`
+    ];
+
+    // Création du contenu CSV
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += headers.join(",") + "\n";
+    csvContent += values.join(",") + "\n";
+
+    // Création du lien de téléchargement
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `client-${window.currentClient.id}-${window.currentClient.lastName}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+
+</body>
+</html>

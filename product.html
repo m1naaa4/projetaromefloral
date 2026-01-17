@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion Produits – Arome Floral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --rose:#d49ca0; --vert:#9fb8ad; --vert-fonce:#3e4a44; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Poppins',sans-serif;background:#faf7f2;padding:40px}
+        h1{color:var(--vert-fonce)}
+        table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,0.08);margin-top:20px}
+        th,td{padding:14px;text-align:left}
+        .actions{display:flex;gap:8px}
+        .btn{padding:6px 12px;border:none;border-radius:6px;font-size:13px;cursor:pointer}
+        .btn-details{background:var(--vert);color:#fff}
+        .btn-edit{background:#f1c27d;color:#fff}
+        .btn-delete{background:#d9534f;color:#fff}
+        #edit-form{margin-top:20px;background:#fff;padding:20px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.08);display:none}
+        #edit-form input, #edit-form select{width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:1px solid #ccc}
+        #edit-form button{background:var(--vert);color:#fff;border:none;padding:10px 18px;border-radius:8px;cursor:pointer}
+        .pagination-box{margin-top:20px;display:flex;justify-content:center;gap:20px;align-items:center}
+        .pagination-box button{background:var(--vert);color:#fff;border:none;padding:10px 20px;border-radius:20px;cursor:pointer}
+        .pagination-box button:disabled{background:#ccc;cursor:not-allowed}
+        .current-page{font-weight:bold;color:var(--vert-fonce)}
+    </style>
+</head>
+<body>
+
+<h1>Gestion des Produits</h1>
+
+<button onclick="showForm()">Ajouter un produit</button>
+
+<!-- FORMULAIRE AJOUT / MODIF -->
+<div id="edit-form">
+    <h3 id="form-title">Ajouter un produit</h3>
+    <input type="text" id="name" placeholder="Nom du produit" required>
+    <input type="number" id="price" placeholder="Prix (MAD)" step="0.01" min="0" required>
+    <select id="category" required>
+        <option value="" disabled selected>Choisir une catégorie</option>
+        <option value="women's clothing">Vêtements femme</option>
+        <option value="men's clothing">Vêtements homme</option>
+        <option value="jewelery">Bijoux</option>
+        <option value="electronics">Électronique</option>
+        <option value="parfum">Parfum</option>
+        <option value="accessoire">Accessoire</option>
+    </select>
+    <button onclick="saveEdit()">Enregistrer</button>
+</div>
+
+<!-- TABLEAU -->
+<table id="products-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Catégorie</th>
+            <th>Prix (MAD)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<div class="pagination-box">
+    <button id="prev-btn">Précédent</button>
+    <span class="current-page" id="page-info">Page 1</span>
+    <button id="next-btn">Suivant</button>
+</div>
+
+<script src="product.js"></script>
+
+</body>
+</html>

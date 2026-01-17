@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails Produit – Arome Floral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --rose: #d49ca0;
+            --vert: #9fb8ad;
+            --vert-fonce: #3e4a44;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #faf7f2;
+            color: var(--vert-fonce);
+        }
+
+        .navbar {
+            height: 70px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .navbar-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: var(--vert-fonce);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 35px;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .card h1 {
+            margin-bottom: 25px;
+            color: var(--vert-fonce);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .detail {
+            margin-bottom: 14px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .detail strong {
+            color: var(--vert-fonce);
+            min-width: 140px;
+            display: inline-block;
+        }
+
+        .export-buttons {
+            margin-top: 35px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            background: var(--vert);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background: var(--vert-fonce);
+            transform: translateY(-1px);
+        }
+
+        .export-btn.csv {
+            background: #5cb85c;
+        }
+
+        .export-btn.csv:hover {
+            background: #4cae4c;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-title">Arome Floral – Détails Produit</div>
+</div>
+
+<div class="content">
+    <div class="card" id="product-details">
+        Chargement...
+    </div>
+</div>
+
+<!-- Inclusion de jsPDF via CDN (version stable 2.5.1) -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<script>
+// ────────────────────────────────────────────────
+// 1. RÉCUPÉRATION DE L'ID DEPUIS L'URL
+// ────────────────────────────────────────────────
+
+// Récupère le paramètre ?id=... dans l'URL (ex: productdetail.html?id=5)
+const id = new URLSearchParams(window.location.search).get("id");
+
+// Vérification immédiate : si aucun ID → affichage d'erreur claire
+if (!id) {
+    document.getElementById("productdetail").innerHTML = `
+        <h1>Erreur</h1>
+        <p>ID du produit manquant dans l'URL.</p>
+        <p>Retournez à la liste des produits pour sélectionner un article.</p>
+    `;
+} else {
+    // ────────────────────────────────────────────────
+    // 2. CHARGEMENT DU PRODUIT VIA API FAKESTORE
+    // ────────────────────────────────────────────────
+
+    fetch(`https://fakestoreapi.com/products/${id}`)
+        .then(res => {
+            // Vérification statut HTTP (meilleure gestion d'erreur)
+            if (!res.ok) {
+                throw new Error(res.status === 404 ? "Produit non trouvé" : "Erreur réseau");
+            }
+            return res.json();
+        })
+        .then(product => {
+            // Stockage global pour pouvoir exporter depuis les fonctions PDF/CSV
+            window.currentProduct = product;
+
+            // ────────────────────────────────────────────────
+            // 3. CONSTRUCTION ET AFFICHAGE DU CONTENU HTML
+            // ────────────────────────────────────────────────
+
+            let htmlContent = `
+                <h1>${product.title}</h1>
+                <div class="detail-grid">
+                    <div class="detail"><strong>Catégorie :</strong> ${product.category}</div>
+                    <div class="detail"><strong>Prix :</strong> ${product.price.toFixed(2)} $</div>
+                </div>
+                <div class="detail description">
+                    <strong>Description :</strong><br>${product.description}
+                </div>
+            `;
+
+            // Ajout conditionnel de l'image (sécurité : si image absente → rien)
+            if (product.image) {
+                htmlContent += `
+                    <div class="product-image-container">
+                        <img src="${product.image}" 
+                             alt="${product.title}" 
+                             style="max-width:320px; max-height:320px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+                    </div>
+                `;
+            }
+
+            // Boutons d'export
+            htmlContent += `
+                <div class="export-buttons">
+                    <button class="export-btn pdf" onclick="exportToPDF()">Exporter en PDF</button>
+                    <button class="export-btn csv" onclick="exportToCSV()">Exporter en CSV</button>
+                </div>
+            `;
+
+            // Injection dans le DOM
+            document.getElementById("product-details").innerHTML = htmlContent;
+        })
+        .catch(err => {
+            // Affichage utilisateur convivial + log technique
+            document.getElementById("product-details").innerHTML = `
+                <h1>Erreur de chargement</h1>
+                <p>Impossible de récupérer le produit (ID : ${id}).</p>
+                <p>${err.message}</p>
+                <p><a href="produits.html">Retour à la liste des produits</a></p>
+            `;
+            console.error("Erreur lors du chargement du produit :", err);
+        });
+}
+
+// ────────────────────────────────────────────────
+// 4. EXPORT PDF – UTILISATION DE jsPDF
+// ────────────────────────────────────────────────
+
+/**
+ * Génère et télécharge un PDF contenant les détails du produit
+ * Mise en page propre, gestion du texte long (description)
+ */
+function exportToPDF() {
+    // Sécurité : vérifier que les données existent
+    if (!window.currentProduct) {
+        alert("Aucune donnée de produit disponible pour l'export PDF.");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // En-tête stylisé
+    doc.setFontSize(20);
+    doc.setTextColor(62, 74, 68); // Couleur verte foncée Arome Floral (exemple)
+    doc.text("Détails Produit - Arome Floral", 20, 20);
+
+    // Informations principales
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text(`Nom : ${window.currentProduct.title}`, 20, 40);
+    doc.text(`Catégorie : ${window.currentProduct.category}`, 20, 52);
+    doc.text(`Prix : ${window.currentProduct.price.toFixed(2)} $`, 20, 64);
+
+    // Description avec word-wrap automatique
+    doc.setFontSize(12);
+    const descLines = doc.splitTextToSize(
+        `Description : ${window.currentProduct.description}`,
+        170  // Largeur max en mm avant retour à la ligne
+    );
+    doc.text(descLines, 20, 80);
+
+    // Mention de l'image (pas d'ajout réel d'image ici pour simplicité)
+    // Note : pour inclure l'image, il faudrait utiliser addImage() + fetch en base64
+    if (window.currentProduct.image) {
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        const yPos = 80 + descLines.length * 7 + 10;
+        doc.text("Image disponible à : " + window.currentProduct.image.substring(0, 80) + "...", 20, yPos);
+    }
+
+    // Sauvegarde du fichier avec nom explicite
+    const safeTitle = window.currentProduct.title.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '_');
+    doc.save(`produit-${window.currentProduct.id}-${safeTitle}.pdf`);
+}
+
+// ────────────────────────────────────────────────
+// 5. EXPORT CSV – FORMAT SIMPLE ET SÉCURISÉ
+// ────────────────────────────────────────────────
+
+/**
+ * Génère et télécharge un fichier CSV contenant les informations du produit
+ * Protection contre les guillemets dans les champs texte
+ */
+function exportToCSV() {
+    if (!window.currentProduct) {
+        alert("Aucune donnée disponible pour l'export CSV.");
+        return;
+    }
+
+    // En-têtes du CSV
+    const headers = ["ID", "Titre", "Prix ($)", "Catégorie", "Description", "URL Image"];
+
+    // Valeurs avec échappement des guillemets (norme CSV)
+    const values = [
+        window.currentProduct.id,
+        `"${window.currentProduct.title.replace(/"/g, '""')}"`,
+        window.currentProduct.price.toFixed(2),
+        `"${window.currentProduct.category.replace(/"/g, '""')}"`,
+        `"${window.currentProduct.description.replace(/"/g, '""')}"`,
+        `"${window.currentProduct.image || ''}"`
+    ];
+
+    // Construction du contenu CSV
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += headers.join(",") + "\n";
+    csvContent += values.join(",") + "\n";
+
+    // Création et déclenchement du téléchargement
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `produit-${window.currentProduct.id}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail Utilisateur – Arome Floral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --vert: #9fb8ad;
+            --vert-fonce: #3e4a44;
+            --rose: #d49ca0;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #faf7f2;
+            color: var(--vert-fonce);
+        }
+        .navbar {
+            height: 70px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .navbar-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: var(--vert-fonce);
+        }
+        .content {
+            padding: 40px 20px;
+        }
+        .card {
+            background: #fff;
+            padding: 35px;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 25px;
+            color: var(--vert-fonce);
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 12px 20px;
+            margin-bottom: 25px;
+        }
+        .detail-label {
+            font-weight: 500;
+            color: var(--vert-fonce);
+        }
+        .export-buttons {
+            margin-top: 35px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .export-btn {
+            background: var(--vert);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        .export-btn:hover {
+            background: var(--vert-fonce);
+            transform: translateY(-1px);
+        }
+        .export-btn.csv {
+            background: #5cb85c;
+        }
+        .export-btn.csv:hover {
+            background: #4cae4c;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-title">Arome Floral – Détail Utilisateur</div>
+</div>
+
+<div class="content">
+    <div class="card" id="user-details">
+        Chargement des informations...
+    </div>
+</div>
+
+<!-- jsPDF pour PDF -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<script>
+const id = new URLSearchParams(window.location.search).get("id");
+
+if (!id) {
+    document.getElementById("user-details").innerHTML = `
+        <h1>Erreur</h1>
+        <p>ID utilisateur manquant dans l'URL.</p>
+    `;
+} else {
+    fetch(`https://dummyjson.com/users/${id}`)
+        .then(res => {
+            if (!res.ok) throw new Error("Utilisateur non trouvé");
+            return res.json();
+        })
+        .then(user => {
+            window.currentUser = user;
+
+            const fullName = `${user.firstName} ${user.lastName}`;
+            const address = user.address ? `${user.address.address}, ${user.address.city}, ${user.address.state || ''}` : '—';
+
+            document.getElementById("user-details").innerHTML = `
+                <h1>${fullName}</h1>
+
+                <div class="detail-grid">
+                    <div class="detail-label">ID :</div><div>${user.id}</div>
+                    <div class="detail-label">Prénom :</div><div>${user.firstName}</div>
+                    <div class="detail-label">Nom :</div><div>${user.lastName}</div>
+                    <div class="detail-label">Nom d'utilisateur :</div><div>${user.username}</div>
+                    <div class="detail-label">Email :</div><div>${user.email}</div>
+                    <div class="detail-label">Téléphone :</div><div>${user.phone}</div>
+                    <div class="detail-label">Âge :</div><div>${user.age || '—'}</div>
+                    <div class="detail-label">Sexe :</div><div>${user.gender || '—'}</div>
+                    <div class="detail-label">Poids :</div><div>${user.weight ? user.weight + ' kg' : '—'}</div>
+                    <div class="detail-label">Taille :</div><div>${user.height ? user.height + ' cm' : '—'}</div>
+                    <div class="detail-label">Adresse :</div><div>${address}</div>
+                    <div class="detail-label">Université :</div><div>${user.university || '—'}</div>
+                </div>
+
+                <div class="export-buttons">
+                    <button class="export-btn" onclick="exportToPDF()">Exporter en PDF</button>
+                    <button class="export-btn csv" onclick="exportToCSV()">Exporter en CSV</button>
+                </div>
+            `;
+        })
+        .catch(err => {
+            document.getElementById("user-details").innerHTML = `
+                <h1>Erreur</h1>
+                <p>Impossible de charger les informations de l'utilisateur (ID: ${id}).</p>
+                <p>${err.message}</p>
+            `;
+            console.error("Erreur chargement utilisateur:", err);
+        });
+}
+
+// ────────────────────────────────────────────────
+// EXPORT PDF (mise en page propre)
+// ────────────────────────────────────────────────
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const user = window.currentUser;
+    const fullName = `${user.firstName} ${user.lastName}`;
+
+    doc.setFontSize(20);
+    doc.setTextColor(62, 74, 68);
+    doc.text(`Utilisateur : ${fullName}`, 20, 20);
+
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+
+    let y = 40;
+    doc.text(`ID : ${user.id}`, 20, y); y += 12;
+    doc.text(`Nom complet : ${fullName}`, 20, y); y += 12;
+    doc.text(`Email : ${user.email}`, 20, y); y += 12;
+    doc.text(`Téléphone : ${user.phone}`, 20, y); y += 12;
+    doc.text(`Âge : ${user.age || '—'} ans`, 20, y); y += 12;
+    doc.text(`Sexe : ${user.gender || '—'}`, 20, y); y += 12;
+    doc.text(`Poids : ${user.weight ? user.weight + ' kg' : '—'}`, 20, y); y += 12;
+    doc.text(`Taille : ${user.height ? user.height + ' cm' : '—'}`, 20, y); y += 12;
+
+    const address = user.address ? `${user.address.address}, ${user.address.city}` : '—';
+    doc.text(`Adresse : ${address}`, 20, y); y += 12;
+
+    if (user.university) {
+        y += 5;
+        doc.text(`Université : ${user.university}`, 20, y);
+    }
+
+    doc.save(`utilisateur-${user.id}-${user.username}.pdf`);
+}
+
+// ────────────────────────────────────────────────
+// EXPORT CSV
+// ────────────────────────────────────────────────
+function exportToCSV() {
+    const user = window.currentUser;
+    if (!user) {
+        alert("Aucune donnée disponible pour l'export.");
+        return;
+    }
+
+    const fullName = `${user.firstName} ${user.lastName}`;
+    const address = user.address ? `${user.address.address}, ${user.address.city}` : '';
+
+    const headers = [
+        "ID",  "Nom complet", "Email",
+    ];
+
+    const values = [
+        user.id,
+
+        `"${fullName}"`,
+        `"${user.email}"`,
+       
+    ];
+
+    let csv = "data:text/csv;charset=utf-8,";
+    csv += headers.join(",") + "\n";
+    csv += values.join(",") + "\n";
+
+    const uri = encodeURI(csv);
+    const link = document.createElement("a");
+    link.href = uri;
+    link.download = `utilisateur-${user.id}-${user.username}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+
+</body>
+</html>
